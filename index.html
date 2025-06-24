@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <header class="formu">
+        <h2 class="title">U-R</h2>
+    </header>
+    <form class="formu" novalidate autocomplete="off">
+        <h1 class="form--title">Pedido</h1>
+        <div class="form--item">
+            <label  for="pruducto">Seleccione el producto deseado</label>
+            <select class="input" name="producto" id="producto">
+                <option  value="">Selecciona una opción</option>
+                <option value="Coca-cola">Coca-cola</option>
+                <option value="Pepsi">Pepsi</option>
+                <option value="Sprite">Sprite</option>
+            </select>
+        </div>
+        <div class="form--item">
+            <label for="cantidad">Seleccione la cantidad</label>
+            <input type="number" name="cantidad" id="cantidad">
+        </div>
+        <div class="form--item">
+            <label for="precio">Ingrese el monto a pagar</label>
+            <input  type="number" id="precio" name="precio">
+        </div>
+        <div class="form--item">
+            <label for="fecha">Seleccione la fecha de su pedido</label>
+            <input type="date" name="fecha">
+        </div>
+        <div class="form--item">
+            <label for="direccion">Ingrese la dirección de su residencia</label>
+            <input type="text" name="direccion">
+        </div>
+        <div class="form--item--submit">
+            <input class="input--submit" type="submit">
+        </div>
+    </form>
+    <hr>
+    <button id="Productos" type="button">Productos</button>
+    <h2>Productos guardados</h2>
+    <div id="Lista de productos"></div>
+    
+    <script>
+        const six= document.querySelector('.formu')
+        const btnp=document.getElementById('Productos')
+        const constP=document.getElementById('lista-productos')
+        six.addEventListener('submit',async (e)=>{
+           e.preventDefault()
+           try{
+                const datos=new FormData(e.target)
+                const objeto=Object.fromEntries(datos.entries())
+                const id=objeto.id
+                const url= id ? `/actualizar/${id}`:"/crear"
+                method= id ? "PUT":"POST"
+                const res=await fetch(url,{
+                method:method,
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify(objeto)
+                 })
+                 if(res.ok){
+                    const texto=await res.text()
+                    alert(texto)
+                    six.reset()
+                    document.getElementById("id").value=""
+                    Leer()
+                 }
+
+           }
+           catch(error){
+            console.error('tu error es:',error)
+           }
+
+        })
+    const Leer=async()=>{
+        try{
+            const res=await fetch("/leer")
+            if(res.ok){
+               const producto= await res.json()
+               mostrarP(producto)
+        }
+    }
+    catch(error){
+        console.error('tu error es:', error)
+    }
+}
+    const mostrarP=(productos)=>{
+        constP.innerHTML=""
+        const fragmento=document.createDocumentFragment()
+        productos.forEach(cosa=>{
+            const pedazo=document.createElement("div")
+            pedazo.className="producto-item"
+            pedazo.innerHTML=`
+            <div className "producto-info">
+                producto: ${cosa.producto}<br>
+                cantidad: ${cosa.cantidad}<br>
+                precio: ${cosa.precio}<br>
+                Direccion: ${cosa.Direccion}<br>
+                fecha: ${cosa.fecha}<br>
+                <div/>
+                <div>
+                    <button onclick="editarp">Editar</button>
+                    <button onclick="deletep">Eliminar</button>
+                </div>
+                <hr>`
+                fragmento.appendChild(pedazo)
+            
+        });
+        contP.appendChild(fragmento)
+    } 
+    const editarp= async (id)=>{
+        try{
+            const res= await res.fetch("/leer")
+            if(res.ok){
+                const producto= await res.json()
+                const objeto=producto.find(p=>p.id===id)
+                if(objeto){
+                    document.getElementById("select").value=producto.producto
+                    document.getElementById("cantidad").value=producto.cantidad
+                    document.getElementById("precio").value=producto.precio
+                    document.querySelector('direccion').value=producto.fecha
+                    document.querySelector('fecha').value=producto.fecha.split('T')[0]
+                    document.getElementById("id").value=producto._id;
+
+                    ft.textcontent="actualizador de pedido"
+                    bf.textContent="Actualizar"
+                }               
+            }
+        }
+        catch(error){
+            console.error('tu error es:',error)
+        }
+    }
+    btnp.addEventListener("click",Leer)
+    </script>
+</body>
+</html>
